@@ -1,15 +1,15 @@
-import { defineAstroPaperConfig } from "./src/types/config";
+import { defineAstroPaperConfig } from "@/types/config.ts";
 
 export default defineAstroPaperConfig({
   site: {
     url: "https://0xneko.dpdns.org/",
-    title: "AstroPaper",
-    description: "A minimal, responsive and SEO-friendly Astro blog theme.",
-    author: "Sat Naing",
-    profile: "https://satna.ing",
-    ogImage: "default-og.jpg",
-    lang: "en",
-    timezone: "Asia/Bangkok",
+    title: "0xNEKO - 一個嶄新的的博客",
+    description: "無。你猜？",
+    author: "Chtx666",
+    profile: "無。你需要找到我的時候，會出現的。",
+    ogImage: "ogImage.png",
+    lang: "zh-TW",
+    timezone: "Asia/Shanghai",
     dir: "ltr",
   },
   posts: {
@@ -29,10 +29,7 @@ export default defineAstroPaperConfig({
     search: "pagefind",
   },
   socials: [
-    { name: "github",   url: "https://github.com/satnaing/astro-paper" },
-    { name: "x",        url: "https://x.com/username" },
-    { name: "linkedin", url: "https://www.linkedin.com/in/username/" },
-    { name: "mail",     url: "mailto:yourmail@gmail.com" },
+    { name: "github",   url: "https://github.com/Chtx666" },
   ],
   shareLinks: [
     { name: "whatsapp", url: "https://wa.me/?text=" },
@@ -41,5 +38,6 @@ export default defineAstroPaperConfig({
     { name: "telegram", url: "https://t.me/share/url?url=" },
     { name: "pinterest", url: "https://pinterest.com/pin/create/button/?url=" },
     { name: "mail",     url: "mailto:?subject=See%20this%20post&body=" },
+    { name: "qq", url: "https://connect.qq.com/widget/shareqq/index.html?url=" },
   ],
 });
