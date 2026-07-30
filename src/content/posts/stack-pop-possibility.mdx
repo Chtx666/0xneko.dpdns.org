@@ -1,0 +1,160 @@
+---
+author: Chtx666
+pubDatetime: 2026-07-30T20:18:00Z
+title: 棧題解
+featured: false
+draft: false
+tags:
+  - coding
+  - OI
+description: "題解。"
+---
+
+## Table of contents
+
+## 原題
+
+<div style="border:1px solid #ccc; padding:10px;">
+# P1044 [NOIP 2003 普及组] 栈
+
+## 题目背景
+
+栈是计算机中经典的数据结构，简单的说，栈就是限制在一端进行插入删除操作的线性表。
+
+栈有两种最重要的操作，即 pop（从栈顶弹出一个元素）和 push（将一个元素进栈）。
+
+栈的重要性不言自明，任何一门数据结构的课程都会介绍栈。宁宁同学在复习栈的基本概念时，想到了一个书上没有讲过的问题，而他自己无法给出答案，所以需要你的帮忙。
+
+## 题目描述
+
+![](https://cdn.luogu.com.cn/upload/image_hosting/5qxy9fz2.png)
+
+宁宁考虑的是这样一个问题：一个操作数序列，$1,2,\ldots ,n$（图示为 1 到 3 的情况），栈 A 的深度大于 $n$。
+
+现在可以进行两种操作，
+
+1. 将一个数，从操作数序列的头端移到栈的头端（对应数据结构栈的 push 操作）
+2. 将一个数，从栈的头端移到输出序列的尾端（对应数据结构栈的 pop 操作）
+
+使用这两种操作，由一个操作数序列就可以得到一系列的输出序列，下图所示为由 `1 2 3` 生成序列 `2 3 1` 的过程。
+
+![](https://cdn.luogu.com.cn/upload/image_hosting/8uwv2pa2.png)
+
+（原始状态如上图所示）
+
+你的程序将对给定的 $n$，计算并输出由操作数序列 $1,2,\ldots,n$ 经过操作可能得到的输出序列的总数。
+
+## 输入格式
+
+输入文件只含一个整数 $n$（$1 \leq n \leq 18$）。
+
+## 输出格式
+
+输出文件只有一行，即可能输出序列的总数目。
+
+## 输入输出样例 #1
+
+### 输入 #1
+
+```
+3
+
+```
+
+### 输出 #1
+
+```
+5
+
+```
+
+## 说明/提示
+
+**【题目来源】**
+
+NOIP 2003 普及组第三题
+</div>
+
+## 暴力
+
+注意到題目中n的數據範圍為[1,18]，因此可以嘗試使用暴力解法深搜；
+
+每次操作討論兩種情況：入棧或出棧（注意回溯）。部分TLE，可拿80分。
+
+```cpp
+#include <iostream>
+#include <stack>
+using namespace std;
+
+int n;
+stack<int> st;
+long long maxi;
+
+void DFS(int now) {
+    if (now == n + 1) {
+        maxi++;
+        return;
+    }
+
+    st.push(now);
+    DFS(now + 1);
+    st.pop();
+
+    if (!st.empty()) {
+        int temp = st.top();
+        st.pop();
+        DFS(now);
+        st.push(temp);
+    }
+}
+
+int main() {
+    cin >> n;
+    DFS(1);
+    cout << maxi << endl;
+    return 0;
+}
+```
+
+## 動態規劃
+
+但是作為求方案數的題目，DP顯然是替代DFS的常用選擇。
+
+狀態設計：
+
+注意到不同操作必然帶來不同的輸出結果，因此不必記錄輸出情況。
+dp[i][j]表示當前還有i個元素等待入棧，剩餘j個元素在棧中的可使用方案數。
+
+初始化：
+
+當待入棧元素為空時，有且僅有一種方案，即將棧中剩餘元素依次出棧。
+
+轉移方程：
+
+1.入棧時：將待入棧元素--，棧中元素++；
+2.（若棧不為空）出棧時：將棧中元素--
+dp[i][j]即為兩種情況（或一種）方案數相加。代碼如下：
+
+```cpp
+#include <iostream>
+#include <stack>
+using namespace std;
+
+int n;
+int dp[20][20];
+
+int main() {
+    cin >> n;
+    for (int j = 0; j <= n; j++)
+        dp[0][j] = 1;
+    for (int i = 1; i <= n; i++)
+        for (int j = 0; j <= n; j++) {
+            dp[i][j] = dp[i - 1][j + 1];
+            if (j > 0)
+                dp[i][j] += dp[i][j - 1];
+        }
+    cout << dp[n][0] << endl;
+    return 0;
+}
+```
+
