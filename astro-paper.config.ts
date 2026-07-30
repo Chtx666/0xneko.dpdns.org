@@ -3,10 +3,10 @@ import { defineAstroPaperConfig } from "@/types/config.ts";
 export default defineAstroPaperConfig({
   site: {
     url: "https://0xneko.dpdns.org/",
-    title: "0xNEKO - 一個嶄新的的博客",
-    description: "無。你猜？",
+    title: "0xNEKO - 一個嶄新的博客",
+    description: "它做你覺得它會做的事。",
     author: "Chtx666",
-    profile: "無。你需要找到我的時候，會出現的。",
+    profile: "你需要找到我的時候，會出現的。",
     ogImage: "ogImage.png",
     lang: "zh-TW",
     timezone: "Asia/Shanghai",
