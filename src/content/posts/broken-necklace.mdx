@@ -1,0 +1,154 @@
+---
+author: Chtx666
+pubDatetime: 2026-08-10
+title: 坏掉的项链-题解
+featured: false
+draft: false
+tags:
+  - coding
+  - OI
+  - 模擬
+description: "題解。"
+---
+
+## Table of contents
+
+## 原題
+
+<div style="border:1px solid #ccc; padding:10px;">
+# P1203 [IOI 1993 / USACO1.1] 坏掉的项链 Broken Necklace
+
+## 题目描述
+
+你有一条由 $n$ 个红色的，白色的，或蓝色的珠子组成的项链，珠子是随意安排的。这里是 $n=29$ 的两个例子:
+
+![](https://cdn.luogu.com.cn/upload/image_hosting/i7imvc0g.png)
+
+第一和第二个珠子在图片中已经被作记号。
+
+图片 A 中的项链可以用下面的字符串表示：`brbrrrbbbrrrrrbrrbbrbbbbrrrrb`
+
+假如你要在一些点打破项链，展开成一条直线，然后从一端开始收集同颜色的珠子直到你遇到一个不同的颜色珠子，在另一端做同样的事（颜色可能与在这之前收集的不同）。确定应该在哪里打破项链来收集到最大数目的珠子。
+
+例如，在图片 A 中的项链中，在珠子 $9$ 和珠子 $10$ 或珠子 $24$ 和珠子 $25$ 之间打断项链可以收集到 $8$ 个珠子。
+
+表现含有白珠项链的字符串将会包括三个符号 `r`，`b`，`w`。
+
+写一个程序来确定从一条被给出的项链可以收集到的珠子最大数目。
+
+::::info[白色珠子是什么？]
+
+在一些项链中还包括白色的珠子（如图片 B）所示。
+
+当收集珠子的时候，一个被遇到的白色珠子可以被当做红色也可以被当做蓝色。
+::::
+
+## 输入格式
+
+第一行一个正整数 $n$，表示珠子数目。
+
+第二行一串长度为 $n$ 的字符串，每个字符是 `r`，`b` 或 `w`。
+
+## 输出格式
+
+输出一行一个整数，表示从给出的项链中可以收集到的珠子的最大数量。
+
+## 输入输出样例 #1
+
+### 输入 #1
+
+```
+29
+wwwbbrwrbrbrrbrbrwrwwrbwrwrrb
+
+```
+
+### 输出 #1
+
+```
+11
+```
+
+## 说明/提示
+
+**【数据范围】**
+
+对于 $100\%$ 的数据，$3\le n \le 350$。
+
+题目翻译来自 NOCOW。
+
+USACO Training Section 1.1
+</div>
+
+## 思路
+
+OK，兄弟們也是做上題了啊。有生之年USACO終於不養奶牛了。
+
+數據範圍到350，直接開始暴力。
+
+模擬珠子斷開后，其實就是在顔色相同時以斷點為中心向外蔓延，特殊處理白色珠子。
+
+注意：
+
+1.題目要求同端珠子顔色相同，因此如遇白色要特殊處理，不能記作當前端珠子顔色，否則會出現R->W->B合法的情況判定合法；
+
+2。當兩端珠子連續長度之和大於n時，要取n。
+
+## 代碼
+
+```cpp
+#include <iostream>
+#include <string>
+using namespace std;
+
+int n;
+string s;
+int maxi;
+
+int Spread(int pos) {
+    int len = 0;
+    int last;
+
+    last = pos;
+    len++;
+    for (int i = pos + 1; len < n; i++) {
+        int t = i % n;
+        if (s[t] == s[last] || s[t] == 'w' || s[last] == 'w') {
+            len++;
+            if (s[t] != 'w' && s[last] == 'w')
+                last = t;
+            continue;
+        }
+        break;
+    }
+
+    last = pos - 1;
+    if (last < 0)
+        last += n;
+    len++;
+    for (int i = pos - 2; len < n; i--) {
+        int t = i;
+        if (t < 0)
+            t += n;
+        if (s[t] == s[last] || s[t] == 'w' || s[last] == 'w') {
+            len++;
+            if (s[t] != 'w' && s[last] == 'w')
+                last = t;
+            continue;
+        }
+        break;
+    }
+
+    return min(len, n);
+}
+
+int main() {
+    cin >> n >> s;
+    for (int i = 0; i < n; i++)
+        maxi = max(maxi, Spread(i));
+    cout << maxi << endl;
+    return 0;
+}
+```
+
+全然沒難度，但坑不少，不過我還是一次提交過了的（實則找AI排查好幾次
