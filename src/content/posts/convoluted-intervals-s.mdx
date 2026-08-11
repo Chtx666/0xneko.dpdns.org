@@ -1,0 +1,224 @@
+---
+author: Chtx666
+pubDatetime: 2026-08-11
+title: 复杂区间S-題解
+featured: false
+draft: false
+tags:
+  - coding
+  - OI
+  - 差分
+  - 前綴和
+description: "題解。"
+---
+
+## Table of contents
+
+## 原題
+
+<div style="border:1px solid #ccc; padding:10px;">
+
+# P7992 [USACO21DEC]  Convoluted Intervals S
+
+## 题目描述
+
+奶牛们正在努力尝试发明有趣的新游戏来玩。他们目前的工作之一与一组 $N$ 个区间（$1\le N\le 2\cdot 10^5$）有关，其中第 $i$ 个区间从数轴上的 $a_i$ 位置开始，并在位置 $b_i \geq a_i$ 结束。$a_i$ 和 $b_i$ 均为 $0 \ldots M$ 范围内的整数，其中 $1 \leq M \leq 5000$。
+
+这个游戏的玩法是，Bessie 选择某个区间（假设是第 $i$ 个区间），而她的表妹 Elsie 选择某个区间（假设是第 $j$ 个区间，可能与 Bessie 所选的的区间相同）。给定某个值 $k$，如果 $a_i + a_j \leq k \leq b_i + b_j$，则她们获胜。
+
+对范围 $0 \ldots 2M$ 内的每个值 $k$，请计算使得 Bessie 和 Elsie 可以赢得游戏的有序对 $(i,j)$ 的数量。
+
+## 输入格式
+
+输入的第一行包含 $N$ 和 $M$。以下 $N$ 行每行以整数 $a_i$ 和 $b_i$ 的形式描述一个区间。
+
+## 输出格式
+
+输出 $2M+1$ 行，依次包含范围 $0 \ldots 2M$ 中的每一个 $k$ 的答案。
+
+## 输入输出样例 #1
+
+### 输入 #1
+
+```
+2 5
+1 3
+2 5
+```
+
+### 输出 #1
+
+```
+0
+0
+1
+3
+4
+4
+4
+3
+3
+1
+1
+
+```
+
+## 说明/提示
+
+【样例解释】
+
+在这个例子中，对于 $k=3$，有三个有序对可以使得 Bessie 和 Elsie 获胜：$(1, 1)$，$(1, 2)$，和 $(2, 1)$。
+
+【数据范围】
+
+- 测试点 1-2 满足 $N\le 100, M\le 100$。
+- 测试点 3-5 满足 $N\le 5000$。
+- 测试点 6-20 没有额外限制。
+
+</div>
+
+## 最暴力
+
+這題很有意思。
+
+拿到題目，我一眼就發現了三個問題（解法
+
+Ⅰ
+
+最直球的方法顯然是遍歷k，然後對於每個k，雙層遍歷兩個區間，判斷是否符合條件。
+
+時間複雜度：O(mn^2) 拉完了，僥幸10分
+
+## 差分
+
+Ⅱ
+
+稍微動點腦筋，不難看出差分以統計答案，優化掉O(m)的複雜度。
+
+（實則在面對洛谷時，筆者回憶起，多年前，老師帶他做這道題的那個下午）
+
+僅需雙層遍歷區間，然後在加得區間範圍内全部增加，即在對應的差分數組開頭及末尾后分別增減，be like：
+
+時間複雜度：O(n^2) 人上人，因爲筆者25分止步於此
+
+```cpp
+for (ll i = 1; i <= n; i++)
+    a[i] = inter[i].a,
+    b[i] = inter[i].b;
+for (ll i = 1; i <= n; i++) {
+    for (ll j = i; j <= n; j++) {
+        ll val = i == j ? 1 : 2;
+        ans[a[i] + a[j]] += val;
+        ans[b[i] + b[j] + 1] -= val;
+    }
+}
+```
+
+## 優化
+
+Ⅲ
+
+經過查題解，筆者發現，n∈[0,200000]，而m∈[1,5000]，真相只有一個！！！
+
+我們可以化n為m，即對區間的a、b的值進行計數處理（不考慮區間對應關係及順序），存進bka、bkb兩個桶（用數組實現）；
+然後遍歷其（O(m^2)），對差分數組進行處理（O(1)），最後對ans做前綴和即可。
+
+代碼如下：
+
+```cpp
+#include <iostream>
+#include <algorithm>
+using namespace std;
+
+typedef long long ll;
+
+struct Pair {
+    ll a;
+    ll b;
+};
+
+ll n, m;
+Pair inter[200010];
+ll a[200010], b[200010];
+ll ans[10010];
+ll bka[5010], bkb[5010];
+
+bool CMP(Pair x, Pair y) {
+    return x.a == y.a ? x.b > y.b : x.a < y.a;
+}
+
+int main() {
+    cin >> n >> m;
+    for (ll i = 1; i <= n; i++)
+        cin >> inter[i].a >> inter[i].b;
+    sort(inter + 1, inter + n + 1, CMP);
+
+    // 暴力做法
+    // for (ll i = 1; i <= n; i++)
+    //     a[i] = inter[i].a,
+    //     b[i] = inter[i].b;
+    // for (ll i = 1; i <= n; i++) {
+    //     for (ll j = i; j <= n; j++) {
+    //         ll val = i == j ? 1 : 2;
+    //         ans[a[i] + a[j]] += val;
+    //         ans[b[i] + b[j] + 1] -= val;
+    //     }
+    // }
+
+    // 開始用桶維護
+    for (ll i = 1; i <= n; i++)
+        bka[inter[i].a]++,
+        bkb[inter[i].b]++;
+    for (ll i = 0; i <= m; i++)
+        for (ll j = 0; j <= m; j++) {
+            ans[i + j] += bka[i] * bka[j];
+            ans[i + j + 1] -= bkb[i] * bkb[j];
+        }
+
+    for (ll i = 0; i <= m * 2; i++) {
+        ans[i] += ans[i - 1];
+        cout << ans[i] << endl;
+    }
+    return 0;
+}
+```
+
+小貼士：
+
+1.由於方案數為bka的二次方數量級，要開long long；
+
+2.在
+
+```cpp
+for (ll i = 0; i <= m; i++)
+    for (ll j = 0; j <= m; j++) {
+        ans[i + j] += bka[i] * bka[j];
+        ans[i + j + 1] -= bkb[i] * bkb[j];
+    }
+```
+
+中，一開始筆者也搞了半天才弄懂：
+```cpp
+ans[i + j] += bka[i] * bka[j];
+ans[i + j + 1] -= bkb[i] * bkb[j];
+```
+爲什麽在i+j処要增加bka的情況，而緊隨其後就要減少bkb呢？
+
+這兩者明明並不存在任何區間上或值上的關聯啊。
+
+原來i+j代表區間開端的值，其實這段代碼就相當於
+
+```cpp
+for (ll i = 0; i <= m; i++)
+    for (ll j = 0; j <= m; j++)
+        ans[i + j] += bka[i] * bka[j];
+for (ll i = 0; i <= m; i++)
+    for (ll j = 0; j <= m; j++)
+        ans[i + j + 1] -= bkb[i] * bkb[j];
+```
+
+衆所周知，差分數組的區間增減，分別應在區間開頭++和在區間末尾再後一位--；
+
+因此上述代碼即分開處理開頭和結尾，得出所有情況。
+
+完~~~
