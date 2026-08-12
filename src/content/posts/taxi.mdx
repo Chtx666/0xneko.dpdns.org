@@ -1,0 +1,130 @@
+---
+author: Chtx666
+pubDatetime: 2026-08-12
+title: Taxi-題解
+featured: false
+draft: false
+tags:
+  - coding
+  - OI
+description: "題解。"
+---
+
+<figure>
+    ![恥辱柱](@/assets/images/taxi-img.png)
+</figure>
+
+## Table of contents
+
+## 原題
+
+<div style="border:1px solid #ccc; padding:10px;">
+
+# CF158B Taxi
+
+## 题目描述
+
+放学后，$n$ 个学生小组决定一起去拜访 Polycarpus，庆祝他的生日。已知第 $i$ 个小组有 $s_i$ 名朋友（$1 \leq s_i \leq 4$），并且他们希望在一起前往 Polycarpus 家。他们决定打出租车去。每辆出租车最多可乘坐 $4$ 人。请问为了让每个小组的成员都能坐在同一辆出租车里（但一辆出租车可以载多个小组），最少需要几辆出租车？
+
+## 输入格式
+
+第一行包含一个整数 $n$（$1 \leq n \leq 10^{5}$），表示小组的数量。第二行包含一组整数 $s_1, s_2, ..., s_n$（$1 \leq s_i \leq 4$），整数之间用空格分隔，$s_i$ 表示第 $i$ 个小组中的孩子数量。
+
+## 输出格式
+
+输出一个整数，表示将所有孩子送到 Polycarpus 家所需的最少出租车数。
+
+## 输入输出样例 #1
+
+### 输入 #1
+
+```
+5
+1 2 4 3 3
+
+```
+
+### 输出 #1
+
+```
+4
+
+```
+
+## 输入输出样例 #2
+
+### 输入 #2
+
+```
+8
+2 3 4 4 2 1 3 1
+
+```
+
+### 输出 #2
+
+```
+5
+
+```
+
+## 说明/提示
+
+在第一个测试样例中，我们可以通过以下方式将孩子们安排到四辆车中：
+
+- 第三个小组（4 个孩子一组）
+- 第四个小组（3 个孩子一组）
+- 第五个小组（3 个孩子一组）
+- 第一个与第二个小组（分别有 1 个和 2 个孩子）
+
+当然，还有其它将小组安排到四辆车的方案。
+
+由 ChatGPT 5 翻译
+
+</div>
+
+## 題解
+
+沒什麽好説的，思想類似复杂区间S。筆者一開始因瀏覽器翻譯錯誤以爲數據範圍到100，
+錯了5次。話説這是第一次發CodeForces的題解，真的卡。
+
+大致就是把小組的順序和編號給忽略，計數后處理，複雜度O(n)穩過。
+
+代碼如下：
+
+```cpp
+// CF 158B
+
+#include <iostream>
+using namespace std;
+
+int n;
+int s[10];
+int ans;
+
+int main() {
+    cin >> n;
+    for (int i = 1; i <= n; i++) {
+        int num;
+        cin >> num;
+        s[num]++;
+    }
+    for (int t = 1; t <= 3; t++) {
+        while (s[t] > 0) {
+            int sum = t;
+            for (int i = 4 - sum; i >= 1; i--) {
+                if (i == t && s[i] == 1) continue;
+                while (s[i] > 0 && i + sum <= 4) {
+                    s[i]--;
+                    sum += i;
+                }
+            }
+            s[t]--;
+            ans++;
+        }
+    }
+    ans += s[4];
+    cout << ans << endl;
+    return 0;
+}
+```
